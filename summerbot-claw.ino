@@ -1,14 +1,16 @@
-#include "pince.hpp"
+#include "claw.hpp"
 #include <Servo.h>
 
 Servo tmplift;
-Servo tmpclamp;
+Servo tmpClampL;
+Servo tmpClampR;
 Pince* pince;
 
 void setup() {
 	tmplift.attach(9);
-	tmpclamp.attach(10);
-	Pince pince(&tmplift,220,&tmpclamp,220);
+	tmpClampL.attach(10);
+	tmpClampR.attach(11);
+	Pince pince(&tmplift,220,&tmpClampL,&tmpClampR,220);
 	Serial.begin(9600);
 	pince.setLiftPos(0);
 	pince.setClampPos(0);

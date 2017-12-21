@@ -4,11 +4,15 @@
 //Standard headers
 #include <Arduino.h>
 #include <Servo.h>
-#include <math.h>
+
+#define UP 0
+#define DOWN 180
+#define OPEN 0
+#define CLOSE 180
 
 class Pince {
 public:
-	Pince(Servo *liftServo, unsigned char lift_speed, Servo *clampServo, unsigned char clamp_speed);
+	Pince(Servo *liftServo, unsigned char lift_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clamp_speed);
 	void setLiftPos(unsigned char pos);
 	void setClampPos(unsigned char pos);
 	void load();
@@ -17,12 +21,9 @@ public:
 	void setClampSpeed(unsigned char clpSpeed);
 
 private:
-	unsigned char up = 0;
-	unsigned char down = 180;
-	unsigned char open = 0;
-	unsigned char close = 180;
 	Servo *lift;
-	Servo *clamp;
+	Servo *clampServoLeft;
+	Servo *clampServoRight;
 	unsigned char lift_speed;
 	unsigned char clamp_speed;
 };

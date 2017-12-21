@@ -1,14 +1,15 @@
 // Pince header
-#include "pince.hpp"
+#include "claw.hpp"
 
 // Fonctions
 
 /**
   *	Pince(lift Servo, uchar lift_speed, clamp Servo, uchar clamp_speed) 
   */
-Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clampServo, unsigned char clp_speed){
+Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clp_speed){
 	lift=liftServo;
-	clamp=clampServo; 
+	clampServoLeft = clpServoR;
+	clampServoRight = clpServoL;
 	lift_speed=255-lt_speed;
 	clamp_speed=255-clp_speed;
 }
@@ -28,9 +29,10 @@ void Pince::setLiftPos(unsigned char pos) {
   */
 
 void Pince::setClampPos(unsigned char pos){
-	const char increment = (clamp->read() < pos ? 1 : -1);
-	for (unsigned char i = clamp->read();i != pos;i += increment) {
-		clamp->write(i);
+	const char increment = (clampServoLeft->read() < pos ? 1 : -1);
+	for (unsigned char i = clampServoRight->read();i != pos;i += increment) {
+		clampServoLeft->write(i);
+		clampServoRight->write(i);
 		delay(clamp_speed);
 	}
 }
@@ -38,18 +40,18 @@ void Pince::setClampPos(unsigned char pos){
   * load()
   */
 void Pince::load(){
-	setLiftPos(down);
+	setLiftPos(DOWN);
 	//capteur pos basse
-	setClampPos(close);
+	setClampPos(CLOSE);
 	//capteur pos fermee
-	setLiftPos(up);
+	setLiftPos(UP);
 	//capteur pos haute
 }
 /**
   * unload()
   */
 void Pince::unload(){
-	setClampPos(open);
+	setClampPos(OPEN);
 	//capteur pos ouverte
 }
 /**
