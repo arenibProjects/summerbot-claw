@@ -8,61 +8,123 @@
   */
 Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clp_speed){
 	lift=liftServo;
-	clampServoLeft = clpServoR;
-	clampServoRight = clpServoL;
-	lift_speed=255-lt_speed;
-	clamp_speed=255-clp_speed;
+	clampLeft = clpServoR;
+	clampRight = clpServoL;
+	liftSpeed = 255 - lt_speed;
+	clampSpeed = 255 - clp_speed;
+	lastClampTime = millis();
+	lastLiftTime = millis();
+	moves.clear();
+	isPaused = false;
+	
 }
+
 /**
   * setLiftPos(uchar pos)
   */
-
 void Pince::setLiftPos(unsigned char pos) {
-	const char increment = (lift->read() < pos ? 1 : -1);
-	for (unsigned char i = lift->read();i != pos;i += increment) {
-		lift->write(i);
-		delay(lift_speed);
-	}
+	addMove(moves,MoveType::Lift,pos);
 }
-/**
-  * setClampPos( uchar pos)
-  */
 
+/**
+  * setClampPos(uchar pos)
+  */
 void Pince::setClampPos(unsigned char pos){
-	const char increment = (clampServoLeft->read() < pos ? 1 : -1);
-	for (unsigned char i = clampServoRight->read();i != pos;i += increment) {
-		clampServoLeft->write(i);
-		clampServoRight->write(i);
-		delay(clamp_speed);
-	}
+	addMove(moves,MoveType::Clamp,pos);
 }
+
 /**
   * load()
   */
 void Pince::load(){
+	
 	setLiftPos(DOWN);
-	//capteur pos basse
 	setClampPos(CLOSE);
-	//capteur pos fermee
 	setLiftPos(UP);
-	//capteur pos haute
+
 }
+
 /**
   * unload()
   */
 void Pince::unload(){
 	setClampPos(OPEN);
-	//capteur pos ouverte
 }
+
+/**
+  * pause
+  */
+void Pince::pause() {
+	isPaused = true;
+}
+
+/**
+  * unpause
+  */
+void  Pince::unpause() {
+	if(isPaused) {
+		isPaused = false;
+	}
+}
+
+/**
+  * clearMoves
+  */
+void Pince::clearMoves() {
+	moves.clear();
+}
+
 /**
   * setClampSpeed
   */
 void Pince::setClampSpeed(unsigned char clpSpeed){
-	clamp_speed=255-clpSpeed;
+	clampSpeed=255-clpSpeed;
 }
+
 /**
   * setLiftSpeed
   */
 void Pince::setLiftSpeed(unsigned char ltSpeed){
-	lift_speed=255-ltSpeed;
+	liftSpeed=255-ltSpeed;
+}
+
+void Pince::update() {
+	if(!moves.empty() && !isPaused) {
+		if(moves.front().type == MoveType::Lift){
+			const int currentPos = lift->read();
+			if(millis() >= (1-liftSpeed)/liftSpeed*lastLiftTime) {
+				const int increment = (currentPos < moves.front().targPos ? 1 : -1);
+				lift->write(currentPos + increment);
+			}
+		
+			if(moves.front().targPos == currentPos) {
+				clearCurrentMove(moves);
+			}
+		}
+	
+		if(moves.front().type == MoveType::Clamp){
+			const int currentPos = clampRight->read();
+			if(millis() >= (1-clampSpeed)/clampSpeed*lastClampTime) {
+				const int increment = (currentPos < moves.front().targPos ? 1 : -1);
+				clampRight->write(currentPos + increment);
+				clampLeft->write(currentPos + increment);
+			}
+		
+			if(moves.front().targPos == currentPos) {
+				clearCurrentMove(moves);
+			}
+		}
+	}
+	
+}
+
+void Pince::clearCurrentMove(std::vector<Move> &moves) {
+	const int size = moves.size();
+	for (int i=1; i<size; i++) {
+		moves[i-1] = moves[i];
+	}
+}
+
+bool Pince::busy() {
+	return moves.empty();
 }
