@@ -10,6 +10,7 @@ Pince* pince;
 void setup() {
 	
 	Serial.begin(9600);
+	delay(5000);
 	
 	//Timer
 	motionTimer.begin(motionLoop,100);// 10kHz (100 is the period in microS)
