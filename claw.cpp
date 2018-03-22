@@ -92,6 +92,7 @@ void Pince::update() {
 	if(!moves.empty() && !isPaused) {
 		if(moves.front().type == MoveType::Lift){
 			const int currentPos = lift->read();
+			Serial.println(currentPos);
 			if(millis() >= (1-liftSpeed)/liftSpeed*lastLiftTime) {
 				const int increment = (currentPos < moves.front().targPos ? 1 : -1);
 				lift->write(currentPos + increment);
@@ -103,7 +104,9 @@ void Pince::update() {
 		}
 	
 		if(moves.front().type == MoveType::Clamp){
+			
 			const int currentPos = clampRight->read();
+			Serial.println(currentPos);
 			if(millis() >= (1-clampSpeed)/clampSpeed*lastClampTime) {
 				const int increment = (currentPos < moves.front().targPos ? 1 : -1);
 				clampRight->write(currentPos + increment);
