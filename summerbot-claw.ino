@@ -15,14 +15,14 @@ void setup() {
 	motionTimer.begin(motionLoop,100);// 10kHz (100 is the period in microS)
 	motionTimer.priority(1); //slightly above normal
 	
-	tmplift.attach(9);
-	tmpClampL.attach(10);
-	tmpClampR.attach(11);
+	tmplift.attach(4);
+	tmpClampL.attach(2);
+	tmpClampR.attach(3);
 	Pince pince(&tmplift,220,&tmpClampL,&tmpClampR,220);
 	
 	Serial.println("resetPos");
-	pince.setLiftPos(0);
-	pince.setClampPos(0);
+	pince.setLiftPos(UP);
+	pince.setClampPos(OPEN);
 	
 }
 

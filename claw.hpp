@@ -7,9 +7,9 @@
 #include <vector>
 
 #define UP 0
-#define DOWN 180
+#define DOWN 30
 #define OPEN 0
-#define CLOSE 180
+#define CLOSE 70
 
 class Pince {
 
