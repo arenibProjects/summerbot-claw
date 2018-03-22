@@ -107,7 +107,7 @@ void Pince::update() {
 			if(millis() >= (1-clampSpeed)/clampSpeed*lastClampTime) {
 				const int increment = (currentPos < moves.front().targPos ? 1 : -1);
 				clampRight->write(currentPos + increment);
-				clampLeft->write(currentPos + increment);
+				clampLeft->write(currentPos - increment);
 			}
 		
 			if(moves.front().targPos == currentPos) {
