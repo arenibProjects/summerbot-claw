@@ -1,12 +1,15 @@
-// Pince header
+//---Pince header
+
 #include "claw.hpp"
 
-// Fonctions
+
+//---Constructor
 
 /**
   *	Pince(lift Servo, uchar lift_speed, clamp Servo, uchar clamp_speed) 
   */
 Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clp_speed){
+
 	lift=liftServo;
 	clampLeft = clpServoR;
 	clampRight = clpServoL;
@@ -14,23 +17,29 @@ Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *
 	clampSpeed = 255 - clp_speed;
 	lastClampTime = millis();
 	lastLiftTime = millis();
-	moves.clear();
 	isPaused = false;
 	
 }
+
+
+//---Functions
 
 /**
   * setLiftPos(uchar pos)
   */
 void Pince::setLiftPos(unsigned char pos) {
-	addMove(moves,MoveType::Lift,pos);
+	Move* mv = new Move(MoveType::Lift,pos);
+    if(moves_)moves_->append(mv);
+    else moves_ = mv;
 }
 
 /**
   * setClampPos(uchar pos)
   */
 void Pince::setClampPos(unsigned char pos){
-	addMove(moves,MoveType::Clamp,pos);
+	Move* mv = new Move(MoveType::Clamp,pos);
+    if(moves_)moves_->append(mv);
+    else moves_ = mv;
 }
 
 /**
@@ -71,7 +80,7 @@ void  Pince::unpause() {
   * clearMoves
   */
 void Pince::clearMoves() {
-	moves.clear();
+	moves_->clear();
 }
 
 /**
@@ -89,45 +98,44 @@ void Pince::setLiftSpeed(unsigned char ltSpeed){
 }
 
 void Pince::update() {
-	if(!moves.empty() && !isPaused) {
-		if(moves.front().type == MoveType::Lift){
+	if(!moves_ && !isPaused) {
+		if(moves_->type_ == MoveType::Lift){
 			const int currentPos = lift->read();
 			Serial.println(currentPos);
 			if(millis() >= (1-liftSpeed)/liftSpeed*lastLiftTime) {
-				const int increment = (currentPos < moves.front().targPos ? 1 : -1);
+				const int increment = (currentPos < moves_->targPos_ ? 1 : -1);
 				lift->write(currentPos + increment);
 			}
 		
-			if(moves.front().targPos == currentPos) {
-				clearCurrentMove(moves);
+			if(moves_->targPos_ == currentPos) {
+				clearCurrentMove(moves_);
 			}
 		}
 	
-		if(moves.front().type == MoveType::Clamp){
+		if(moves_->type_ == MoveType::Clamp){
 			
 			const int currentPos = clampRight->read();
 			Serial.println(currentPos);
 			if(millis() >= (1-clampSpeed)/clampSpeed*lastClampTime) {
-				const int increment = (currentPos < moves.front().targPos ? 1 : -1);
+				const int increment = (currentPos < moves_->targPos_ ? 1 : -1);
 				clampRight->write(currentPos + increment);
 				clampLeft->write(currentPos - increment);
 			}
 		
-			if(moves.front().targPos == currentPos) {
-				clearCurrentMove(moves);
+			if(moves_->targPos_ == currentPos) {
+				clearCurrentMove(moves_);
 			}
 		}
 	}
 	
 }
 
-void Pince::clearCurrentMove(std::vector<Move> &moves) {
-	const int size = moves.size();
-	for (int i=1; i<size; i++) {
-		moves[i-1] = moves[i];
-	}
+void clearCurrentMove () {
+	Move* move = moves_;
+	move = moves_->getNext();
+	delete move;
 }
 
-bool Pince::busy() {
-	return moves.empty();
+bool Pince::isBusy() {
+	return moves_;
 }

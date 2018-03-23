@@ -13,7 +13,7 @@ void setup() {
 	delay(5000);
 	
 	//Timer
-	motionTimer.begin(motionLoop,100);// 10kHz (100 is the period in microS)
+	motionTimer.begin(motionLoop,5000);// 0.2Hz (100 is the period in microS)
 	motionTimer.priority(1); //slightly above normal
 	
 	tmplift.attach(4);
@@ -29,7 +29,7 @@ void setup() {
 
 void loop() {
 	
-	while(pince->busy()){
+	while(pince->isBusy()){
 		delay(500);
 	}
 	
