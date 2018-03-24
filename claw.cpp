@@ -1,68 +1,183 @@
-// Pince header
+//---Pince header
+
 #include "claw.hpp"
 
-// Fonctions
+
+//---Constructor
 
 /**
   *	Pince(lift Servo, uchar lift_speed, clamp Servo, uchar clamp_speed) 
   */
-Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clp_speed){
+Claw::Claw(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clp_speed){
+
 	lift=liftServo;
-	clampServoLeft = clpServoR;
-	clampServoRight = clpServoL;
-	lift_speed=255-lt_speed;
-	clamp_speed=255-clp_speed;
+	clampLeft = clpServoR;
+	clampRight = clpServoL;
+	liftSpeed = 255 - lt_speed;
+	clampSpeed = 255 - clp_speed;
+	lastClampTime = millis();
+	lastLiftTime = millis();
+	isPaused = false;
+	moves_ = NULL;
+	
 }
-/**
-  * setLiftPos(uchar pos)
-  */
 
-void Pince::setLiftPos(unsigned char pos) {
-	const char increment = (lift->read() < pos ? 1 : -1);
-	for (unsigned char i = lift->read();i != pos;i += increment) {
-		lift->write(i);
-		delay(lift_speed);
+
+//---Functions
+
+/**
+  * moveLift(uchar pos)
+  */
+void Claw::moveLift(unsigned char pos) {
+	if(lift->read() != pos) {
+		ClawMove* mv = new ClawMove(MoveType::Lift,pos);
+		if(moves_)moves_->append(mv);
+		else moves_ = mv;
 	}
 }
-/**
-  * setClampPos( uchar pos)
-  */
 
-void Pince::setClampPos(unsigned char pos){
-	const char increment = (clampServoLeft->read() < pos ? 1 : -1);
-	for (unsigned char i = clampServoRight->read();i != pos;i += increment) {
-		clampServoLeft->write(i);
-		clampServoRight->write(i);
-		delay(clamp_speed);
+/**
+  * moveClamp(uchar pos)
+  */
+void Claw::moveClamp(unsigned char pos){
+	if(clampRight->read() != pos) {
+		ClawMove* mv = new ClawMove(MoveType::Clamp,pos);
+		if(moves_)moves_->append(mv);
+		else moves_ = mv;
 	}
 }
+
 /**
   * load()
   */
-void Pince::load(){
-	setLiftPos(DOWN);
-	//capteur pos basse
-	setClampPos(CLOSE);
-	//capteur pos fermee
-	setLiftPos(UP);
-	//capteur pos haute
+void Claw::load() {
+	
+	moveLift(DOWN);
+	moveClamp(CLOSE);
+	moveLift(UP);
+
 }
+
 /**
   * unload()
   */
-void Pince::unload(){
-	setClampPos(OPEN);
-	//capteur pos ouverte
+void Claw::unload() {
+	
+	moveLift(DOWN);
+	moveClamp(OPEN);
+	moveLift(UP);
+
 }
+
+/**
+  * stack()
+  */
+void Claw::stack() {
+
+	moveLift(DOWN);
+	moveClamp(CLOSE-1);
+	moveClamp(CLOSE);
+	moveLift(UP);
+	
+}
+
+  
+/**
+  * pause
+  */
+void Claw::pause() {
+	isPaused = true;
+}
+
+/**
+  * unpause
+  */
+void  Claw::unpause() {
+	if(isPaused) {
+		isPaused = false;
+	}
+}
+
+/**
+  * clearMoves
+  */
+void Claw::clearMoves() {
+	moves_->clear();
+}
+
+/**
+  * movesString
+  */
+String Claw::movesString(){
+  String r="";
+  ClawMove* mv =moves_;
+  while(mv){
+    r+=mv->toString();
+    mv=mv->getNext();
+  }
+  return r;
+}
+
 /**
   * setClampSpeed
   */
-void Pince::setClampSpeed(unsigned char clpSpeed){
-	clamp_speed=255-clpSpeed;
+void Claw::setClampSpeed(unsigned char clpSpeed){
+	clampSpeed=255-clpSpeed;
 }
+
 /**
   * setLiftSpeed
   */
-void Pince::setLiftSpeed(unsigned char ltSpeed){
-	lift_speed=255-ltSpeed;
+void Claw::setLiftSpeed(unsigned char ltSpeed){
+	liftSpeed=255-ltSpeed;
+}
+
+void Claw::update() {
+	
+	if(moves_) {
+		Serial.println(moves_->toString());
+	}
+	
+	if(moves_ && !isPaused) {
+		if(moves_->type_ == MoveType::Lift){
+			const int currentPos = lift->read();
+			Serial.println(currentPos);
+			if(millis() >= (1-liftSpeed)/liftSpeed*lastLiftTime) {
+				const int increment = (currentPos < moves_->targPos_ ? 1 : -1);
+				lift->write(currentPos - increment);
+			}
+		
+			if(moves_->targPos_ == currentPos) {
+				clearCurrentMove();
+			}
+		}
+	
+		if(moves_->type_ == MoveType::Clamp){
+			const int currentPos = clampRight->read();
+			Serial.println(currentPos);
+			if(millis() >= (1-clampSpeed)/clampSpeed*lastClampTime) {
+				const int increment = (currentPos < moves_->targPos_ ? 1 : -1);
+				clampRight->write(currentPos - increment);
+				clampLeft->write(currentPos + increment);
+			}
+		
+			if(moves_->targPos_ == currentPos) {
+				clearCurrentMove();
+			}
+		}
+	}
+}
+	
+void Claw::clearCurrentMove () {
+	ClawMove* mv = moves_;
+	moves_ = moves_->getNext();
+	delete mv;
+}
+
+void Claw::openWide() {
+	//to be coded
+}
+
+bool Claw::isBusy() {
+	return moves_;
 }
