@@ -18,6 +18,7 @@ Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *
 	lastClampTime = millis();
 	lastLiftTime = millis();
 	isPaused = false;
+	moves_ = NULL;
 	
 }
 
@@ -28,7 +29,7 @@ Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *
   * setLiftPos(uchar pos)
   */
 void Pince::setLiftPos(unsigned char pos) {
-	Move* mv = new Move(MoveType::Lift,pos);
+	ClawMove* mv = new ClawMove(MoveType::Lift,pos);
     if(moves_)moves_->append(mv);
     else moves_ = mv;
 }
@@ -37,9 +38,10 @@ void Pince::setLiftPos(unsigned char pos) {
   * setClampPos(uchar pos)
   */
 void Pince::setClampPos(unsigned char pos){
-	Move* mv = new Move(MoveType::Clamp,pos);
+	ClawMove* mv = new ClawMove(MoveType::Clamp,pos);
     if(moves_)moves_->append(mv);
     else moves_ = mv;
+	
 }
 
 /**
@@ -84,6 +86,19 @@ void Pince::clearMoves() {
 }
 
 /**
+  * movesString
+  */
+String Pince::movesString(){
+  String r="";
+  ClawMove* mv =moves_;
+  while(mv){
+    r+=mv->toString();
+    mv=mv->getNext();
+  }
+  return r;
+}
+
+/**
   * setClampSpeed
   */
 void Pince::setClampSpeed(unsigned char clpSpeed){
@@ -98,7 +113,12 @@ void Pince::setLiftSpeed(unsigned char ltSpeed){
 }
 
 void Pince::update() {
-	if(!moves_ && !isPaused) {
+	
+	if(moves_) {
+		Serial.println(moves_->toString());
+	}
+	
+	if(moves_ && !isPaused) {
 		if(moves_->type_ == MoveType::Lift){
 			const int currentPos = lift->read();
 			Serial.println(currentPos);
@@ -108,12 +128,11 @@ void Pince::update() {
 			}
 		
 			if(moves_->targPos_ == currentPos) {
-				clearCurrentMove(moves_);
+				clearCurrentMove();
 			}
 		}
 	
 		if(moves_->type_ == MoveType::Clamp){
-			
 			const int currentPos = clampRight->read();
 			Serial.println(currentPos);
 			if(millis() >= (1-clampSpeed)/clampSpeed*lastClampTime) {
@@ -123,19 +142,18 @@ void Pince::update() {
 			}
 		
 			if(moves_->targPos_ == currentPos) {
-				clearCurrentMove(moves_);
+				clearCurrentMove();
 			}
 		}
 	}
+}
 	
-}
+	void Pince::clearCurrentMove () {
+		ClawMove* mv = moves_;
+		moves_ = moves_->getNext();
+		delete mv;
+	}
 
-void clearCurrentMove () {
-	Move* move = moves_;
-	move = moves_->getNext();
-	delete move;
-}
-
-bool Pince::isBusy() {
-	return moves_;
-}
+	bool Pince::isBusy() {
+		return moves_;
+	}

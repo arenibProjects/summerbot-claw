@@ -16,21 +16,21 @@ enum MoveType {
 	Clamp = 2
 };
 
-class Move {
+class ClawMove {
 	
     public:
         MoveType type_;
         unsigned char targPos_;
-        Move* next_=0;
-        Move(MoveType type,unsigned char targPos):type_{type},targPos_{targPos}{};
-        Move* getNext(){
+        ClawMove* next_=0;
+        ClawMove(MoveType type,unsigned char targPos):type_{type},targPos_{targPos}{};
+        ClawMove* getNext(){
             return next_;
         }
-        Move* getLast(){
+        ClawMove* getLast(){
             if(next_) return next_->getLast();
             else return this;
         }
-        void append(Move* nn){
+        void append(ClawMove* nn){
             if(next_){
                 next_->append(nn);
             }else{
@@ -51,7 +51,7 @@ class Move {
 class Pince {
 
 private:
-		Move *moves_ = (Move*)0;
+		ClawMove *moves_;
 	
 	Servo *lift;
 	Servo *clampLeft;
@@ -67,15 +67,16 @@ public:
 	Pince(Servo *liftServo, unsigned char lift_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clamp_speed);
 	void setLiftPos(unsigned char pos);
 	void setClampPos(unsigned char pos);
+	void setClampSpeed(unsigned char clpSpeed);
+	void setLiftSpeed(unsigned char ltSpeed);
 	void load();
 	void unload();
 	void pause();
 	void unpause();
 	void clearMoves();
-	void setClampSpeed(unsigned char clpSpeed);
-	void setLiftSpeed(unsigned char ltSpeed);
 	void update();
-	void clearCurrentMove(Move* mv); 
+	void clearCurrentMove();
+	String movesString();
 	bool isBusy();
 
 };
