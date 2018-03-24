@@ -5,7 +5,7 @@ IntervalTimer motionTimer;
 Servo tmplift;
 Servo tmpClampL;
 Servo tmpClampR;
-Pince* pince;
+Claw* claw;
 
 
 void setup() {
@@ -20,34 +20,34 @@ void setup() {
 	tmplift.attach(4);
 	tmpClampL.attach(2);
 	tmpClampR.attach(3);
-	pince = new Pince(&tmplift,220,&tmpClampL,&tmpClampR,220);
+	claw = new Claw(&tmplift,220,&tmpClampL,&tmpClampR,220);
 	Serial.println("resetLift");
-	pince->setLiftPos(UP);
-	Serial.println(pince->movesString());
+	claw->moveLift(UP);
+	Serial.println(claw->movesString());
 	Serial.println("resetClamp");
-	pince->setClampPos(OPEN);
-	Serial.println(pince->movesString());
+	claw->moveClamp(OPEN);
+	Serial.println(claw->movesString());
 	Serial.println("fin setup");
 
 }
 
 void loop() {
 	
-	Serial.println(pince->movesString());
+	Serial.println(claw->movesString());
 	
-	while(pince->isBusy()){
+	while(claw->isBusy()){
 		delay(500);
 	}
 	
 	Serial.println("unload");
-	pince->unload();
+	claw->unload();
 	Serial.println("load");
-	pince->load();
+	claw->load();
 	delay(1000);
 	
 }
 
 void motionLoop() {
-	pince->update();
+	claw->update();
 	
 }

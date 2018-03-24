@@ -48,7 +48,7 @@ class ClawMove {
         }
 };
 
-class Pince {
+class Claw {
 
 private:
 		ClawMove *moves_;
@@ -64,21 +64,28 @@ private:
 
 public:
 
-	Pince(Servo *liftServo, unsigned char lift_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clamp_speed);
-	void setLiftPos(unsigned char pos);
-	void setClampPos(unsigned char pos);
-	void setClampSpeed(unsigned char clpSpeed);
-	void setLiftSpeed(unsigned char ltSpeed);
+	Claw(Servo *liftServo, unsigned char lift_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clamp_speed);
+
+	//movements
+	void moveLift(unsigned char pos);
+	void moveClamp(unsigned char pos);
 	void load();
 	void unload();
 	void pause();
 	void unpause();
 	void clearMoves();
-	void update();
 	void clearCurrentMove();
-	String movesString();
-	bool isBusy();
 
+	//speeds
+	void setClampSpeed(unsigned char clpSpeed);
+	void setLiftSpeed(unsigned char ltSpeed);
+
+	//update
+	void update();
+
+	//infos
+	bool isBusy();
+	String movesString();
 };
 
 #endif

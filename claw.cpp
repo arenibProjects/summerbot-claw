@@ -8,7 +8,7 @@
 /**
   *	Pince(lift Servo, uchar lift_speed, clamp Servo, uchar clamp_speed) 
   */
-Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clp_speed){
+Claw::Claw(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clp_speed){
 
 	lift=liftServo;
 	clampLeft = clpServoR;
@@ -26,53 +26,60 @@ Pince::Pince(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *
 //---Functions
 
 /**
-  * setLiftPos(uchar pos)
+  * moveLift(uchar pos)
   */
-void Pince::setLiftPos(unsigned char pos) {
-	ClawMove* mv = new ClawMove(MoveType::Lift,pos);
-    if(moves_)moves_->append(mv);
-    else moves_ = mv;
+void Claw::moveLift(unsigned char pos) {
+	if(lift->read() != pos) {
+		ClawMove* mv = new ClawMove(MoveType::Lift,pos);
+		if(moves_)moves_->append(mv);
+		else moves_ = mv;
+	}
 }
 
 /**
-  * setClampPos(uchar pos)
+  * moveClamp(uchar pos)
   */
-void Pince::setClampPos(unsigned char pos){
-	ClawMove* mv = new ClawMove(MoveType::Clamp,pos);
-    if(moves_)moves_->append(mv);
-    else moves_ = mv;
-	
+void Claw::moveClamp(unsigned char pos){
+	if(clampRight->read() != pos) {
+		ClawMove* mv = new ClawMove(MoveType::Clamp,pos);
+		if(moves_)moves_->append(mv);
+		else moves_ = mv;
+	}
 }
 
 /**
   * load()
   */
-void Pince::load(){
+void Claw::load(){
 	
-	setLiftPos(DOWN);
-	setClampPos(CLOSE);
-	setLiftPos(UP);
+	moveLift(DOWN);
+	moveClamp(CLOSE);
+	moveLift(UP);
 
 }
 
 /**
   * unload()
   */
-void Pince::unload(){
-	setClampPos(OPEN);
+void Claw::unload(){
+	
+	moveLift(DOWN);
+	moveClamp(OPEN);
+	moveLift(UP);
+
 }
 
 /**
   * pause
   */
-void Pince::pause() {
+void Claw::pause() {
 	isPaused = true;
 }
 
 /**
   * unpause
   */
-void  Pince::unpause() {
+void  Claw::unpause() {
 	if(isPaused) {
 		isPaused = false;
 	}
@@ -81,14 +88,14 @@ void  Pince::unpause() {
 /**
   * clearMoves
   */
-void Pince::clearMoves() {
+void Claw::clearMoves() {
 	moves_->clear();
 }
 
 /**
   * movesString
   */
-String Pince::movesString(){
+String Claw::movesString(){
   String r="";
   ClawMove* mv =moves_;
   while(mv){
@@ -101,18 +108,18 @@ String Pince::movesString(){
 /**
   * setClampSpeed
   */
-void Pince::setClampSpeed(unsigned char clpSpeed){
+void Claw::setClampSpeed(unsigned char clpSpeed){
 	clampSpeed=255-clpSpeed;
 }
 
 /**
   * setLiftSpeed
   */
-void Pince::setLiftSpeed(unsigned char ltSpeed){
+void Claw::setLiftSpeed(unsigned char ltSpeed){
 	liftSpeed=255-ltSpeed;
 }
 
-void Pince::update() {
+void Claw::update() {
 	
 	if(moves_) {
 		Serial.println(moves_->toString());
@@ -148,12 +155,12 @@ void Pince::update() {
 	}
 }
 	
-	void Pince::clearCurrentMove () {
-		ClawMove* mv = moves_;
-		moves_ = moves_->getNext();
-		delete mv;
-	}
+void Claw::clearCurrentMove () {
+	ClawMove* mv = moves_;
+	moves_ = moves_->getNext();
+	delete mv;
+}
 
-	bool Pince::isBusy() {
-		return moves_;
-	}
+bool Claw::isBusy() {
+	return moves_;
+}
