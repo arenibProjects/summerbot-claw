@@ -5,10 +5,10 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#define UP 0
-#define DOWN 30
-#define OPEN 0
-#define CLOSE 70
+#define UP 5
+#define DOWN 25
+#define OPEN 5
+#define CLOSE 65
 
 enum MoveType {
 	None = 0,
@@ -71,6 +71,8 @@ public:
 	void moveClamp(unsigned char pos);
 	void load();
 	void unload();
+	void stack();
+	void openWide();
 	void pause();
 	void unpause();
 	void clearMoves();

@@ -50,7 +50,7 @@ void Claw::moveClamp(unsigned char pos){
 /**
   * load()
   */
-void Claw::load(){
+void Claw::load() {
 	
 	moveLift(DOWN);
 	moveClamp(CLOSE);
@@ -61,7 +61,7 @@ void Claw::load(){
 /**
   * unload()
   */
-void Claw::unload(){
+void Claw::unload() {
 	
 	moveLift(DOWN);
 	moveClamp(OPEN);
@@ -69,6 +69,19 @@ void Claw::unload(){
 
 }
 
+/**
+  * stack()
+  */
+void Claw::stack() {
+
+	moveLift(DOWN);
+	moveClamp(CLOSE-1);
+	moveClamp(CLOSE);
+	moveLift(UP);
+	
+}
+
+  
 /**
   * pause
   */
@@ -131,7 +144,7 @@ void Claw::update() {
 			Serial.println(currentPos);
 			if(millis() >= (1-liftSpeed)/liftSpeed*lastLiftTime) {
 				const int increment = (currentPos < moves_->targPos_ ? 1 : -1);
-				lift->write(currentPos + increment);
+				lift->write(currentPos - increment);
 			}
 		
 			if(moves_->targPos_ == currentPos) {
@@ -144,8 +157,8 @@ void Claw::update() {
 			Serial.println(currentPos);
 			if(millis() >= (1-clampSpeed)/clampSpeed*lastClampTime) {
 				const int increment = (currentPos < moves_->targPos_ ? 1 : -1);
-				clampRight->write(currentPos + increment);
-				clampLeft->write(currentPos - increment);
+				clampRight->write(currentPos - increment);
+				clampLeft->write(currentPos + increment);
 			}
 		
 			if(moves_->targPos_ == currentPos) {
@@ -159,6 +172,10 @@ void Claw::clearCurrentMove () {
 	ClawMove* mv = moves_;
 	moves_ = moves_->getNext();
 	delete mv;
+}
+
+void Claw::openWide() {
+	//to be coded
 }
 
 bool Claw::isBusy() {
