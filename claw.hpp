@@ -9,6 +9,7 @@
 #define DOWN 25
 #define OPEN 5
 #define CLOSE 65
+#define OFFSET 0
 
 enum MoveType {
 	None = 0,
@@ -51,7 +52,8 @@ class ClawMove {
 class Claw {
 
 private:
-		ClawMove *moves_;
+	
+	ClawMove *moves_;
 	
 	Servo *lift;
 	Servo *clampLeft;
@@ -65,6 +67,7 @@ private:
 public:
 
 	Claw(Servo *liftServo, unsigned char lift_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clamp_speed);
+  void init();
 
 	//movements
 	void moveLift(unsigned char pos);
