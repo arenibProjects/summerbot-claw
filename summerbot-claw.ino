@@ -21,6 +21,11 @@ void setup() {
 	tmpClampL.attach(3);
 	tmpClampR.attach(2);
 	claw = new Claw(&tmplift,200,&tmpClampL,&tmpClampR,200);
+	delay(100);
+	claw->init();
+	Serial.println("Claw initilized");
+	Serial.println("waiting 3s for motion to complete");
+	delay(3000);
 	init = true;
 
 }

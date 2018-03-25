@@ -24,6 +24,18 @@ Claw::Claw(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *cl
 
 
 //---Functions
+/**
+  * init( )
+  */
+
+void Claw::init(){
+  lift->write(DOWN);
+  delay(20);
+  clampLeft->write(CLOSE);
+  delay(20);
+  clampRight->write(300-CLOSE+OFFSET);
+  delay(20);
+}
 
 /**
   * moveLift(uchar pos)
@@ -133,10 +145,6 @@ void Claw::setLiftSpeed(unsigned char ltSpeed){
 }
 
 void Claw::update() {
-	
-	if(moves_) {
-		Serial.println(moves_->toString());
-	}
 	
 	if(moves_ && !isPaused) {
 		if(moves_->type_ == MoveType::Lift){
