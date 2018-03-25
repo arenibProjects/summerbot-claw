@@ -29,11 +29,12 @@ Claw::Claw(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *cl
   */
 
 void Claw::init(){
-  lift->write(DOWN);
+  lift->write(UP);
+  Serial.println(lift->read());
   delay(20);
-  clampLeft->write(CLOSE);
+  clampRight->write(CLOSE);
   delay(20);
-  clampRight->write(300-CLOSE+OFFSET);
+  clampLeft->write(300 - CLOSE+OFFSET);
   delay(20);
 }
 
@@ -41,7 +42,11 @@ void Claw::init(){
   * moveLift(uchar pos)
   */
 void Claw::moveLift(int targPos) {
-	if(lift->read() == targPos) {
+	
+	if(lift->read() != targPos) {
+		
+		Serial.println("moveLift");
+		
 		ClawMove* mv = new ClawMove(MoveType::Lift,targPos);
 		if(moves_)moves_->append(mv);
 		else moves_ = mv;
@@ -52,7 +57,11 @@ void Claw::moveLift(int targPos) {
   * moveClamp(uchar pos)
   */
 void Claw::moveClamp(int targPos) {
-	if(clampRight->read() == targPos) {
+	
+	if(clampRight->read() != targPos) {
+
+		Serial.println("moveClamp");
+	
 		ClawMove* mv = new ClawMove(MoveType::Clamp,targPos);
 		if(moves_)moves_->append(mv);
 		else moves_ = mv;
@@ -121,11 +130,11 @@ void Claw::clearMoves() {
   * movesString
   */
 String Claw::movesString(){
-  String r="";
-  ClawMove* mv =moves_;
+  String r = "";
+  ClawMove* mv = moves_;
   while(mv){
-    r+=mv->toString();
-    mv=mv->getNext();
+    r += mv->toString();
+    mv = mv->getNext();
   }
   return r;
 }
@@ -134,22 +143,34 @@ String Claw::movesString(){
   * setClampSpeed
   */
 void Claw::setClampSpeed(unsigned char clpSpeed){
-	clampSpeed=255-clpSpeed;
+	clampSpeed = 255 - clpSpeed;
 }
 
 /**
   * setLiftSpeed
   */
 void Claw::setLiftSpeed(unsigned char ltSpeed){
-	liftSpeed=255-ltSpeed;
+	liftSpeed = 255 - ltSpeed;
 }
 
 void Claw::update() {
 	
+	// Serial.println(moves_);
+	// Serial.println("update");
 	if(moves_ && !isPaused) {
+		
+		Serial.println("not paused");
+		Serial.println(moves_->toString());
+		
 		if(moves_->type_ == MoveType::Lift){
+			
+			Serial.println("lift");
+			
 			const int currentPos = lift->read();
-			const int increment = (moves_->targPos_-currentPos > 0 ? 1 : -1);
+			
+			Serial.println(currentPos);
+			
+			const int increment = (moves_->targPos_ - currentPos > 0 ? 1 : -1);
 			const int newPos = currentPos + increment;
 			lift->write(newPos);
 			if(abs(newPos - moves_->targPos_) < 1) {
@@ -158,10 +179,16 @@ void Claw::update() {
 		}
 	
 		if(moves_->type_ == MoveType::Clamp){
+
+			Serial.println("clamp");
+		
 			const int currentPos = clampRight->read();
-			const int increment = (moves_->targPos_-currentPos > 0 ? 1 : -1);
+			
+			Serial.println(currentPos);
+			
+			const int increment = (moves_->targPos_ - currentPos > 0 ? 1 : -1);
 			clampRight->write(currentPos + increment);
-			clampLeft->write(300-currentPos - increment);
+			clampLeft->write(300 - currentPos + OFFSET - increment);
 			if(abs(currentPos + increment - moves_->targPos_) < 1) {
 				clearCurrentMove();
 			}
@@ -176,7 +203,8 @@ void Claw::clearCurrentMove () {
 }
 
 void Claw::openWide() {
-	//to be coded
+	moveLift(UP);
+	moveClamp(OPEN);
 }
 
 bool Claw::isBusy() {

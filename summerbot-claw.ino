@@ -11,7 +11,7 @@ bool init;
 void setup() {
 
 	//Timer
-	motionTimer.begin(motionLoop,1000000);// 10kHz (100 is the period in microS)
+	motionTimer.begin(motionLoop,50000);// 10kHz (100 is the period in microS)
 	motionTimer.priority(1); //slightly above normal
   
 	Serial.begin(9600);
@@ -26,16 +26,17 @@ void setup() {
 	Serial.println("Claw initilized");
 	Serial.println("waiting 3s for motion to complete");
 	delay(3000);
-	init = true;
+	init = false;
 
 }
 
 void loop() {
 	
 	if(init) {
-		
+		Serial.println("test");
 		//claw->moveLift(DOWN);	
 		Serial.println(claw->movesString());
+		claw->moveLift(DOWN);
 		claw->moveClamp(OPEN);
 		Serial.println(claw->movesString());
 		//claw->moveLift(DOWN);
@@ -47,8 +48,8 @@ void loop() {
 	//claw->moveLift(DOWN);
 	//claw->moveLift(UP)
 	
-	Serial.print("isBusy :");
-	Serial.println(claw->isBusy());
+	// Serial.print("isBusy :");
+	// Serial.println(claw->isBusy());
 }
 
 void motionLoop() {
