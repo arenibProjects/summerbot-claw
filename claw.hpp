@@ -5,10 +5,10 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#define UP 5
-#define DOWN 25
-#define OPEN 5
-#define CLOSE 65
+#define UP 25
+#define DOWN 5
+#define OPEN 50
+#define CLOSE 20
 
 enum MoveType {
 	None = 0,
@@ -20,9 +20,9 @@ class ClawMove {
 	
     public:
         MoveType type_;
-        unsigned char targPos_;
+        int targPos_;
         ClawMove* next_=0;
-        ClawMove(MoveType type,unsigned char targPos):type_{type},targPos_{targPos}{};
+        ClawMove(MoveType type,int targPos):type_{type},targPos_{targPos}{};
         ClawMove* getNext(){
             return next_;
         }
@@ -67,8 +67,8 @@ public:
 	Claw(Servo *liftServo, unsigned char lift_speed, Servo *clpServoR, Servo *clpServoL, unsigned char clamp_speed);
 
 	//movements
-	void moveLift(unsigned char pos);
-	void moveClamp(unsigned char pos);
+	void moveLift(int moveAngle);
+	void moveClamp(int moveAngle);
 	void load();
 	void unload();
 	void stack();

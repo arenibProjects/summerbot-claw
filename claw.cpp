@@ -28,9 +28,9 @@ Claw::Claw(Servo *liftServo, unsigned char lt_speed, Servo *clpServoR, Servo *cl
 /**
   * moveLift(uchar pos)
   */
-void Claw::moveLift(unsigned char pos) {
-	if(lift->read() != pos) {
-		ClawMove* mv = new ClawMove(MoveType::Lift,pos);
+void Claw::moveLift(int targPos) {
+	if(lift->read() == targPos) {
+		ClawMove* mv = new ClawMove(MoveType::Lift,targPos);
 		if(moves_)moves_->append(mv);
 		else moves_ = mv;
 	}
@@ -39,9 +39,9 @@ void Claw::moveLift(unsigned char pos) {
 /**
   * moveClamp(uchar pos)
   */
-void Claw::moveClamp(unsigned char pos){
-	if(clampRight->read() != pos) {
-		ClawMove* mv = new ClawMove(MoveType::Clamp,pos);
+void Claw::moveClamp(int targPos) {
+	if(clampRight->read() == targPos) {
+		ClawMove* mv = new ClawMove(MoveType::Clamp,targPos);
 		if(moves_)moves_->append(mv);
 		else moves_ = mv;
 	}
@@ -141,27 +141,20 @@ void Claw::update() {
 	if(moves_ && !isPaused) {
 		if(moves_->type_ == MoveType::Lift){
 			const int currentPos = lift->read();
-			Serial.println(currentPos);
-			if(millis() >= (1-liftSpeed)/liftSpeed*lastLiftTime) {
-				const int increment = (currentPos < moves_->targPos_ ? 1 : -1);
-				lift->write(currentPos - increment);
-			}
-		
-			if(moves_->targPos_ == currentPos) {
+			const int increment = (moves_->targPos_-currentPos > 0 ? 1 : -1);
+			const int newPos = currentPos + increment;
+			lift->write(newPos);
+			if(abs(newPos - moves_->targPos_) < 1) {
 				clearCurrentMove();
 			}
 		}
 	
 		if(moves_->type_ == MoveType::Clamp){
 			const int currentPos = clampRight->read();
-			Serial.println(currentPos);
-			if(millis() >= (1-clampSpeed)/clampSpeed*lastClampTime) {
-				const int increment = (currentPos < moves_->targPos_ ? 1 : -1);
-				clampRight->write(currentPos - increment);
-				clampLeft->write(currentPos + increment);
-			}
-		
-			if(moves_->targPos_ == currentPos) {
+			const int increment = (moves_->targPos_-currentPos > 0 ? 1 : -1);
+			clampRight->write(currentPos + increment);
+			clampLeft->write(300-currentPos - increment);
+			if(abs(currentPos + increment - moves_->targPos_) < 1) {
 				clearCurrentMove();
 			}
 		}

@@ -18,9 +18,9 @@ void setup() {
 	delay(5000);
 		
 	tmplift.attach(4);
-	tmpClampL.attach(2);
-	tmpClampR.attach(3);
-	claw = new Claw(&tmplift,100,&tmpClampL,&tmpClampR,100);
+	tmpClampL.attach(3);
+	tmpClampR.attach(2);
+	claw = new Claw(&tmplift,200,&tmpClampL,&tmpClampR,200);
 	init = true;
 
 }
@@ -29,15 +29,12 @@ void loop() {
 	
 	if(init) {
 		
-		Serial.println("resetLift");
-		claw->moveLift(UP);	
+		//claw->moveLift(DOWN);	
 		Serial.println(claw->movesString());
-		Serial.println("resetClamp");
 		claw->moveClamp(OPEN);
 		Serial.println(claw->movesString());
-		Serial.println("fin setup");
-		claw->moveLift(DOWN);
-		claw->moveClamp(CLOSE);
+		//claw->moveLift(DOWN);
+		//claw->moveClamp(CLOSE);
 		init = false;
 		
 	}
@@ -45,7 +42,8 @@ void loop() {
 	//claw->moveLift(DOWN);
 	//claw->moveLift(UP)
 	
-	Serial.println(claw->movesString());
+	Serial.print("isBusy :");
+	Serial.println(claw->isBusy());
 }
 
 void motionLoop() {
