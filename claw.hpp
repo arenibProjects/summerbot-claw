@@ -5,10 +5,10 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#define UP 120
-#define DOWN 110
+#define UP 100 //120
+#define DOWN 0 //110
 #define OPEN 5
-#define CLOSE 30
+#define CLOSE 85
 #define OFFSET 0
 
 enum MoveType {
@@ -58,7 +58,8 @@ class ClawMove {
 class Claw {
 
 private:
-		ClawMove *moves_;
+	
+	ClawMove *moves_;
 	
 	Servo *lift;
 	Servo *clampLeft;
