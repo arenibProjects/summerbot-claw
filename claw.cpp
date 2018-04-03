@@ -35,7 +35,7 @@ void Claw::init() {
   delay(50);
   clampRight->write(CLOSE);
   delay(50);
-  clampLeft->write(180 - CLOSE + OFFSET);
+  clampLeft->write(180 - CLOSE - OFFSET);
   delay(50);
 
 }
