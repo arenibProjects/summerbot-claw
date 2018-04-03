@@ -142,10 +142,10 @@ void Claw::update() {
 
       // Serial.println(currentPos);
 
-      const int increment = (moves_->targPos_ - currentPos > 0 ? 1 : -1);
+      const int increment = (moves_->targPos_ - currentPos > 0 ? SPEED : -SPEED);
       const int newPos = currentPos + increment;
       lift->write(newPos);
-      if (abs(newPos - moves_->targPos_) < 1) {
+      if (abs(newPos - moves_->targPos_) < SPEED) {
         clearCurrentMove();
       }
     }
@@ -158,10 +158,10 @@ void Claw::update() {
 
       // Serial.println(currentPos);
 
-      const int increment = (moves_->targPos_ - currentPos > 0 ? 1 : -1);
+      const int increment = (moves_->targPos_ - currentPos > 0 ? SPEED : -SPEED);
       clampRight->write(currentPos + increment);
       clampLeft->write(180 - currentPos + OFFSET - increment);
-      if (abs(currentPos + increment - moves_->targPos_) < 1) {
+      if (abs(currentPos + increment - moves_->targPos_) < SPEED) {
         clearCurrentMove();
       }
     }

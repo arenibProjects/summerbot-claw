@@ -5,11 +5,12 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#define UP 100 //120
-#define DOWN 0 //110
+#define UP 0 //120
+#define DOWN 100 //110
 #define OPEN 5
 #define CLOSE 85
 #define OFFSET 0
+#define SPEED 10
 
 enum MoveType {
 	None = 0,
