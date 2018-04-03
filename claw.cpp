@@ -25,12 +25,12 @@ Claw::Claw(Servo *liftServo, Servo *clpServoR, Servo *clpServoL) {
     init()
 */
 void Claw::init() {
-  lift->write(0);
+  /*lift->write(0);
   delay(50);
   clampRight->write(0);
   delay(50);
   clampLeft->write(0);
-  delay(50);
+  delay(50);*/
   lift->write(UP);
   delay(50);
   clampRight->write(CLOSE);
