@@ -9,7 +9,7 @@
 #define DOWN 0 //110
 #define OPEN 5
 #define CLOSE 85
-#define OFFSET 0
+#define OFFSET 90
 #define SPEED 1
 
 enum MoveType {
