@@ -160,7 +160,7 @@ void Claw::update() {
 
       const int increment = (moves_->targPos_ - currentPos > 0 ? SPEED : -SPEED);
       clampRight->write(currentPos + increment);
-      clampLeft->write(180 - currentPos + OFFSET - increment);
+      clampLeft->write(180 - currentPos - OFFSET - increment);
       if (abs(currentPos + increment - moves_->targPos_) < SPEED) {
         clearCurrentMove();
       }
