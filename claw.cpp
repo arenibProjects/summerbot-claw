@@ -29,9 +29,9 @@ void Claw::init(){
   lift->write(UP);
   Serial.println(lift->read());
   delay(20);
-  clampRight->write(OPEN);
+  clampRight->write(CLOSE);
   delay(20);
-  clampLeft->write(MAXPOS - OPEN+OFFSET);
+  clampLeft->write(MAXPOS - CLOSE+OFFSET);
   delay(20);
 
 }
