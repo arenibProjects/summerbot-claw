@@ -10,7 +10,6 @@
 #define OPEN 5
 #define CLOSE 85
 #define OFFSET 90
-#define MAXPOS 180
 #define SPEED 1
 
 enum MoveType {

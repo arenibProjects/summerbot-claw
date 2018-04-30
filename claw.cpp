@@ -31,7 +31,7 @@ void Claw::init(){
   delay(20);
   clampRight->write(CLOSE);
   delay(20);
-  clampLeft->write(MAXPOS - CLOSE+OFFSET);
+  clampLeft->write(300 - CLOSE+OFFSET);
   delay(20);
 
 }
@@ -165,7 +165,7 @@ void Claw::update() {
 			
 			const int increment = (moves_->targPos_ - currentPos > 0 ? 1 : -1);
 			clampRight->write(currentPos + increment);
-			clampLeft->write(MAXPOS - currentPos + OFFSET - increment);
+			clampLeft->write(300 - currentPos + OFFSET - increment);
 			if(abs(currentPos + increment - moves_->targPos_) < 1) {
 				clearCurrentMove();
 			}
