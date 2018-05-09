@@ -5,12 +5,12 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#define UP 100 //120
+#define UP 70 //120
 #define DOWN 0 //110
-#define OPEN 5
-#define CLOSE 85
-#define OFFSET 90
-#define SPEED 1
+#define OPEN 50
+#define CLOSE 100
+#define OFFSET 8
+#define SPEED 2
 
 enum MoveType {
 	None = 0,
@@ -19,23 +19,23 @@ enum MoveType {
 };
 
 class ClawMove {
-	
+
     public:
-	
+
         MoveType type_;
         int targPos_;
         ClawMove* next_ = 0;
         ClawMove(MoveType type,int targPos):type_{type},targPos_{targPos}{};
-		
+
         ClawMove* getNext(){
             return next_;
         }
-		
+
         ClawMove* getLast(){
             if(next_) return next_->getLast();
             else return this;
         }
-		
+
         void append(ClawMove* nn){
             if(next_){
                 next_->append(nn);
@@ -43,14 +43,14 @@ class ClawMove {
                 next_ = nn;
             }
         }
-		
+
         void clear(){
             if(next_){
                 next_->clear();
                 delete next_;
             }
         }
-		
+
         String toString(){
           return "|"+String(type_)+","+String(targPos_)+">";
         }
@@ -59,9 +59,9 @@ class ClawMove {
 class Claw {
 
 private:
-	
+
 	ClawMove *moves_;
-	
+
 	Servo *lift;
 	Servo *clampLeft;
 	Servo *clampRight;
@@ -72,7 +72,7 @@ public:
 	//initialisation
 	Claw(Servo *liftServo, Servo *clpServoR, Servo *clpServoL);
 	void init();
-	
+
 	//movements
 	void moveLift(int moveAngle);
 	void moveClamp(int moveAngle);

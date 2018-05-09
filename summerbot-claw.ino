@@ -1,4 +1,5 @@
 #include "claw.hpp"
+#include "pinout.h"
 #include <Servo.h>
 
 IntervalTimer motionTimer;
@@ -17,9 +18,9 @@ void setup() {
   Serial.begin(9600);
   delay(5000);
 
-  tmplift.attach(4);
-  tmpClampL.attach(3);
-  tmpClampR.attach(2);
+  tmplift.attach(SERVO1);
+  tmpClampL.attach(SERVO6);
+  tmpClampR.attach(SERVO7);
   claw = new Claw(&tmplift, &tmpClampL, &tmpClampR);
   delay(100);
   claw->init();
@@ -34,15 +35,47 @@ void loop() {
 
   if (init) {
 
-    /*Serial.println("test");
+    Serial.println("down");
+    Serial.println(claw->getPos());
+    Serial.println(claw->movesString());
     claw->moveLift(DOWN);
+    while(claw->isBusy()) {
+      delay(100);
+    }
+    delay(1000);
+    Serial.println(claw->getPos());
+    Serial.println(claw->movesString());
+    Serial.println("up");
+    Serial.println(claw->getPos());
     Serial.println(claw->movesString());
     claw->moveLift(UP);
+    while(claw->isBusy()) {
+      delay(100);
+    }
+    delay(1000);
+    Serial.println(claw->getPos());
+    Serial.println(claw->movesString());
+    Serial.println("close");
+    Serial.println(claw->getPos());
+    Serial.println(claw->movesString());
+    claw->moveClamp(CLOSE);
+    while(claw->isBusy()) {
+      delay(100);
+    }
+    delay(1000);
+    Serial.println(claw->getPos());
+    Serial.println(claw->movesString());
+    Serial.println("open");
+    Serial.println(claw->getPos());
+    Serial.println(claw->movesString());
     claw->moveClamp(OPEN);
+    while(claw->isBusy()) {
+      delay(100);
+    }
+    delay(1000);
+    Serial.println(claw->getPos());
     Serial.println(claw->movesString());
-    claw->moveLift(DOWN);
-    claw->moveClamp(CLOSE);*/
-    claw->load();
+    /*claw->load();
     claw->unload();
     claw->load();
     claw->unload();
@@ -51,7 +84,7 @@ void loop() {
     claw->load();
     claw->unload();
     Serial.println(claw->movesString());
-    init = false;
+    init = false;*/
 
   }
 
